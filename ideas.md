@@ -46,12 +46,77 @@ Now, AI agent in general (and CLI agent in particular) is a general-purpose proa
 
 I think that is related to both human abilities (programmers normally cannot do work of the lawyer as good as lawyer can, and vice versa), and internal company structure - which divides the overall flow of particles of all kind and organize them into complex system, where different 'particle processor' types (i.e. specializations) arise. So, like the human needs a specialization, so does an AI agent.
 
+## Project Scope and Initial Focus
+
+I want to start developing a general-purpose process automation system, and test/refine it on the example of a software development company with its specific processes. The approach will be to build an MVP first and then gradually increase complexity.
+
+## Particle Structure and Flow Mechanisms
+
+The exact definition of particles needs to be determined. Possible options include:
+- Structured data objects with metadata (type, priority, source, destination)
+- Documents/files with standardized headers
+- Database records with specific schemas
+
+This is a key design decision that will impact the entire system architecture.
+
+## Agent Specialization Approach
+
+Agent specializations will be defined by:
+- Base model selection (using several different base models)
+- System prompts specific to each role
+- Tool access permissions tailored to each specialization
+
+No fine-tuning of models is planned at this stage.
+
+## Process Definition Methodology
+
+Several options need to be evaluated for process definition:
+- BPMN (Business Process Model and Notation)
+- Directed Acyclic Graphs (DAGs) like Airflow
+- State machines for agent workflows
+- Custom domain-specific language for particle flows
+- Visual programming interfaces
+
+Each approach has different trade-offs in terms of expressiveness, tooling support, and implementation complexity.
+
+## Human-in-the-Loop Strategy
+
+The target is eventual full autonomy, but an "auditor in the loop" should be designed from the start. This auditor role could be filled by either a human or a specialized agent.
+
+## Observability and Logging
+
+All activities should be traced and logged to persistent storage for debugging, monitoring, and analysis. This logging should be linked to:
+- Session identifiers
+- Tenant/user information
+- Agent/activity identifiers
+- Other relevant context
+
+This observability layer needs to be designed as a separate component of the system.
+
+## Technical Architecture Decisions
+
+### CLI Agent Management
+Existing CLI agents will be utilized. Agents will have freedom to accomplish goals defined in process definitions, with most actions being tool calls (CRUD operations on files, shell commands, etc.).
+
+### Particle Processing Model
+Each agent acts as a "particle processor" with specific inputs and outputs. For example:
+- QA process: input = codebase with tests, output = test results report with issue analysis
+
+### Virtual Environment Management
+Work isolation is critical. Each project/task should run in isolated environments (VMs, Docker containers, etc.) to prevent cross-contamination.
+
 ## Company Process Definition
 
-Now let's discuss one of the goals of this project, in particular defining a company. From my standpoint, the company is defined by the "particle flow design": departments, activities, data/document/artifact/money flows, role definitions, etc. And this all is needed and influenced by the products and services the company produces. 
-
-And here is what comes to my mind when speaking of this: BPMN diagrams. Maybe something else can be applicable here, if so please let me know, we will discuss it as well.
+From my standpoint, the company is defined by the "particle flow design": departments, activities, data/document/artifact/money flows, role definitions, etc. This is influenced by the products and services the company produces.
 
 ## Process Automation
 
-So, eventually we decide on some formal description/definition of the inner company's processes. Now, I want to implement its automation. There may be some projects for that (like automation and execution of BPMN) which solves it for some parts. And I will probably need to implement the remaining parts.
+Once a formal description/definition of the company's processes is established, automation can be implemented. There may be existing projects for parts of this (like BPMN automation), with remaining parts needing custom implementation.
+
+## Additional Topics to Discuss
+
+The following topics need further exploration:
+- Defining a minimal viable product (MVP) scope
+- Creating a more detailed technical architecture
+- Designing the particle data structure and flow rules
+- Planning the development roadmap with incremental milestones
