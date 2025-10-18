@@ -68,20 +68,126 @@ Agent specializations will be defined by:
 
 No fine-tuning of models is planned at this stage.
 
+Agent specializations are company-specific and will be defined in separate configuration files for each company type. For example, software development companies will have different specializations than manufacturing companies.
+
+### Agent Interaction Patterns
+
+Agents interact through the particle flow system, with each agent specializing in processing specific types of input particles and producing specific types of output particles. The interaction patterns are defined by the company's BPMN processes and the generated DAGs.
+
 ## Process Definition Methodology
 
-Several options need to be evaluated for process definition:
-- BPMN (Business Process Model and Notation)
-- Directed Acyclic Graphs (DAGs) like Airflow
-- State machines for agent workflows
-- Custom domain-specific language for particle flows
-- Visual programming interfaces
+A hybrid approach will be used, combining multiple methodologies:
 
-Each approach has different trade-offs in terms of expressiveness, tooling support, and implementation complexity.
+### Multi-Level Process Architecture
+
+#### Level 1: BPMN for Company-Wide Processes
+- Define major business processes (e.g., "Feature Development", "Bug Fixing", "Customer Onboarding")
+- Show departmental handoffs and decision points
+- Serve as the "organization chart" for process flows
+- Relatively static, updated only when business processes change
+
+#### Level 2: Dynamic DAG Generation
+- Agents analyze BPMN processes and generate execution DAGs for specific instances
+- Each node represents an atomic task that can be executed independently
+- DAGs can be optimized, parallelized, and adapted based on current conditions
+- This is where the "particle processing" happens
+
+#### Level 3: Task Execution
+- Atomic tasks execute via:
+  - RPC calls to microservices
+  - Tool calls to MCP servers
+  - Sub-agent delegation for complex tasks
+  - Direct CLI commands in virtual environments
+
+### Open Questions for BPMN/DAG Architecture
+
+1. **DAG Execution Engine Requirements**
+   - How to handle dependencies between tasks?
+   - What retry mechanisms are needed for failed tasks?
+   - How to manage parallel execution and resource allocation?
+   - What's the best approach for tracking execution state and progress?
+
+2. **Agent-to-DAG Translation**
+   - How much context does an agent need about the overall process?
+   - Should there be templates for common process patterns?
+   - How to handle exceptions not covered in the BPMN?
+   - What's the balance between agent autonomy and predefined patterns?
+
+3. **State Management**
+   - Where to store process state? (In-memory, database, distributed cache?)
+   - How to handle long-running processes that span days/weeks?
+   - What's the recovery mechanism if the system crashes mid-process?
+
+4. **Particle Flow Integration**
+   - How to trace a particle's journey through BPMN → DAG → execution?
+   - What metadata needs to be preserved at each level?
+   - How to handle particle transformation between levels?
+
+5. **Error Handling and Recovery**
+   - How to handle failures that cascade across levels?
+   - What's the rollback strategy for partially completed DAGs?
+   - How to implement circuit breakers for failing processes?
+
+6. **Performance and Scalability**
+   - How to optimize DAG execution for parallel processing?
+   - What's the strategy for handling large numbers of concurrent processes?
+   - How to implement resource pooling for virtual environments?
+
+7. **Testing and Validation**
+   - How to test the entire system end-to-end?
+   - What's the strategy for validating BPMN to DAG translation?
+   - How to implement integration testing for the multi-level architecture?
 
 ## Human-in-the-Loop Strategy
 
-The target is eventual full autonomy, but an "auditor in the loop" should be designed from the start. This auditor role could be filled by either a human or a specialized agent.
+The target is eventual full autonomy, but with configurable approval mechanisms built into the process flow.
+
+### Approval Severity Levels
+
+Tasks and activities in BPMN processes will be configured with approval severity levels that determine when human intervention is required:
+
+- **No Approval**: Tasks execute autonomously without intervention
+- **Low Severity**: Non-critical tasks that can proceed with logging only
+- **Medium Severity**: Important tasks that may require notification but not blocking
+- **High Severity**: Critical tasks that require human approval before proceeding
+- **Critical Severity**: Tasks that block all execution until explicitly approved
+
+### Default Operating Mode
+
+The system will operate in **fully autonomous mode** by default, with only critical failure notifications that block further execution. This provides:
+
+- Continuous autonomous execution of most tasks
+- Automatic intervention only when critical failures occur
+- Blocking mechanisms to prevent cascade failures
+- Alert generation for critical issues requiring immediate attention
+
+### Audit/Tracing Mode
+
+An optional **audit/tracing mode** will be available that requires approval for all activities, regardless of their configured severity level. This mode is useful for:
+
+- Initial testing and validation of new processes
+- Training periods for new agent specializations
+- Compliance requirements in regulated industries
+- Debugging complex process flows
+
+### Approval Workflow
+
+When a task requires approval:
+1. Task execution pauses at the configured approval point
+2. Notification is sent to designated approvers (human or specialized agent)
+3. Approver can review the task context, inputs, and expected outputs
+4. Approver can approve, reject, or request modifications
+5. System proceeds based on the approval decision
+
+### Auditor Interface Requirements
+
+The auditor interface will need to provide:
+- Real-time monitoring dashboard of all active processes
+- Detailed particle flow visualization
+- Agent performance metrics and behavior patterns
+- Approval queue management with severity-based filtering
+- Manual intervention controls (pause, resume, rollback, modify)
+- Historical analysis and reporting capabilities
 
 ## Observability and Logging
 
