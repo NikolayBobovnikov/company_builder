@@ -201,6 +201,51 @@ This observability layer needs to be designed as a separate component of the sys
 
 ## Technical Architecture Decisions
 
+### BPMN/DAG Automation Options
+
+Several open-source projects can be leveraged for process automation:
+
+#### BPMN Automation
+- **Camunda BPM Platform**: Open-source workflow and decision automation platform with BPMN 2.0 support
+- **Flowable**: Open-source business process engine that supports BPMN 2.0
+- **jBPM**: Open-source business process management suite with BPMN 2.0 support
+- **Activiti**: Open-source BPMN engine (forked into Flowable and Camunda)
+
+#### DAG Execution
+- **Apache Airflow**: Platform to programmatically author, schedule and monitor workflows
+- **Prefect**: Modern workflow management system, with DAG-based approach
+- **Dask**: Parallel computing with task scheduling and DAG execution
+- **Luigi**: Python module that helps build complex pipelines of batch jobs
+
+#### Integration Approach
+We can use these existing tools as foundations, extending them to support:
+- Particle-based data flow
+- AI agent integration
+- Dynamic DAG generation from BPMN
+- Custom approval workflows
+
+### Technology Stack Migration Strategy
+
+#### Phase 1: Python Prototyping
+- **Framework**: FastAPI for APIs, Flask for simple services
+- **Task Queue**: Celery with Redis/RabbitMQ
+- **Database**: PostgreSQL for structured data, MongoDB for flexible schemas
+- **Process Engine**: Integrate with existing BPMN/DAG tools via Python APIs
+- **AI Integration**: OpenAI SDK, LangChain for agent orchestration
+
+#### Phase 2: Production Rewrite
+For migration to Go/Rust/C++, consider these approaches:
+
+1. **Microservices Architecture**: Break system into small, independent services
+   - Each service can be rewritten independently
+   - Clear API contracts between services
+   - Gradual migration path
+
+2. **Interface-First Design**:
+   - Define clear interfaces between components
+   - Implement business logic separately from infrastructure
+   - Easier to port logic between languages
+
 ### CLI Agent Management
 Existing CLI agents will be utilized. Agents will have freedom to accomplish goals defined in process definitions, with most actions being tool calls (CRUD operations on files, shell commands, etc.).
 
